@@ -1,0 +1,42 @@
+#!/usr/bin/env python
+from Tkinter import *
+
+line=[]
+can=[]
+leftdown=False
+def line_adjust(e):
+	global leftdown
+	global line
+
+	if(not leftdown):
+		return
+	coor=can.coords(line)
+	
+	d1=(coor[0]-e.x)*(coor[0]-e.x)+(coor[1]-e.y)*(coor[1]-e.y)
+	d2=(coor[2]-e.x)*(coor[2]-e.x)+(coor[3]-e.y)*(coor[3]-e.y)
+	if (d1<d2):
+		coor[0]=e.x
+		coor[1]=e.y
+	else:
+		coor[2]=e.x
+		coor[3]=e.y
+	can.coords(line,coor[0],coor[1],coor[2],coor[3])
+def left_button_down(e):
+	global leftdown
+	leftdown=True
+	line_adjust(e)
+def left_button_release(e):
+	global leftdown
+	leftdown=False	
+
+root=Tk()
+root.geometry("800x400")
+
+can=Canvas(root,width=800,height=400)
+can.pack()
+
+line=can.create_line(10,20,300,400,fill='red',width=3)
+can.bind("<Button-1>",left_button_down)
+can.bind("<ButtonRelease-1>",left_button_release)
+can.bind("<Motion>",line_adjust)
+root.mainloop()
