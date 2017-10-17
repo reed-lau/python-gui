@@ -1,9 +1,19 @@
 #!/usr/bin/env python
 from Tkinter import *
+import random
+import numpy
 
 line=[]
+root=[]
 can=[]
+axisx=None
+axisy=None
+
 leftdown=False
+
+x=[]
+y=[]
+
 def line_adjust(e):
 	global leftdown
 	global line
@@ -21,22 +31,76 @@ def line_adjust(e):
 		coor[2]=e.x
 		coor[3]=e.y
 	can.coords(line,coor[0],coor[1],coor[2],coor[3])
+
 def left_button_down(e):
 	global leftdown
 	leftdown=True
 	line_adjust(e)
+
 def left_button_release(e):
 	global leftdown
 	leftdown=False	
 
+def resize(e):
+	global root
+	can.configure(width=root.winfo_width(),height=root.winfo_height())
+	draw_axis()
+	print("draw axis")
+
+def get_data_range(x,y):
+	return (min(x),max(x),min(y),max(y))
+
+def get_margin(xy):
+	marginx=(xy[1]-xy[0])/6.0;
+	marginy=(xy[3]-xy[2])/6.0;
+
+	if marginx<=0:
+		marginx=1
+	if marginy<=0:
+		marginy=1
+
+	return  (marginx,marginy)
+def draw_axis():
+	global can
+	global axisx,axisy
+	width=int(can.cget('width'))
+	height=int(can.cget('height'))
+	
+	x0=width/8;
+	x1=width-x0;
+	y1=height/8;
+	y0=height-y1;
+	if not axisx: 
+		axisx=can.create_line(x0,y0,x0,y1,width=3)
+	else:
+		can.coords(axisx,x0,y0,x0,y1)
+	if not axisy:
+		axisy=can.create_line(x0,y0,x1,y0,width=3)
+	else:
+		can.coords(axisy,x0,y0,x1,y0)
+
+for i in range(10):
+	x.append(random.random())
+	y.append(random.random())
+
+
 root=Tk()
 root.geometry("800x400")
 
+menu=Menu()
+
 can=Canvas(root,width=800,height=400)
 can.pack()
+
+# draw axis
+draw_axis()
+
 
 line=can.create_line(10,20,300,400,fill='red',width=3)
 can.bind("<Button-1>",left_button_down)
 can.bind("<ButtonRelease-1>",left_button_release)
 can.bind("<Motion>",line_adjust)
+
+root.bind("<Configure>",resize)
+
 root.mainloop()
